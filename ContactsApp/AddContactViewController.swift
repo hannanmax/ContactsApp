@@ -12,7 +12,7 @@ class AddContactViewController: UIViewController {
 
     var selectedContact: Contact? = nil
     
-    
+    @IBOutlet weak var warningLabel: UILabel!
     @IBOutlet weak var nameTextField: UITextField!
     @IBOutlet weak var phoneNumberTextField: UITextField!
     
@@ -31,43 +31,51 @@ class AddContactViewController: UIViewController {
     
     @IBAction func saveButton(_ sender: Any) {
         
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        let context: NSManagedObjectContext = appDelegate.persistentContainer.viewContext
-        if(selectedContact == nil) {
-        let entity = NSEntityDescription.entity(forEntityName: "Contact", in: context)
-        let newContact = Contact(entity: entity!, insertInto: context)
-        //newContact.id = Contacts.count as NSNumber
-        newContact.name = nameTextField.text
-        newContact.phonenumber = phoneNumberTextField.text
-        
-        do {
-            try context.save()
-            Contacts.append(newContact)
-            print(Contacts)
-            navigationController?.popViewController(animated: true)
-        } catch  {
-            print("It failed")
-        }
-            
-        }
-        
-        else {
-            let request = NSFetchRequest<NSFetchRequestResult>(entityName: "Contact")
-            
-            do {
-                let results:NSArray = try context.fetch(request) as NSArray
-                for result in results {
-                    let contact = result as! Contact
-                    if(contact == selectedContact) {
-                        contact.name = nameTextField.text
-                        contact.phonenumber = phoneNumberTextField.text
-                        try context.save()
-                        navigationController?.popViewController(animated: true)
-                    }
-                }
+        if (nameTextField.text!.count <  1) {
+            let alert = CustomAlertController(title: "Pleae enter a name", message: "Name field is empty")
+            DispatchQueue.main.async {
+                self.present(alert.showAlert(), animated: true, completion: nil)
             }
-            catch{
-                print("Didn't get any contact")
+        } else if (phoneNumberTextField.text!.count < 1) {
+            let alert = CustomAlertController(title: "Pleae enter a phone number", message: "Phone Number field is empty")
+            DispatchQueue.main.async {
+                self.present(alert.showAlert(), animated: true, completion: nil)
+            }
+        } else {
+            warningLabel.text = ""
+            let appDelegate = UIApplication.shared.delegate as! AppDelegate
+            let context: NSManagedObjectContext = appDelegate.persistentContainer.viewContext
+            if(selectedContact == nil) {
+                let entity = NSEntityDescription.entity(forEntityName: "Contact", in: context)
+                let newContact = Contact(entity: entity!, insertInto: context)
+
+                newContact.name = nameTextField.text
+                newContact.phonenumber = phoneNumberTextField.text
+                
+                do {
+                    try context.save()
+                    Contacts.append(newContact)
+                    navigationController?.popViewController(animated: true)
+                } catch  {
+                    print("Failed to save contact")
+                }
+            } else {
+                let request = NSFetchRequest<NSFetchRequestResult>(entityName: "Contact")
+                
+                do {
+                    let results:NSArray = try context.fetch(request) as NSArray
+                    for result in results {
+                        let contact = result as! Contact
+                        if(contact == selectedContact) {
+                            contact.name = nameTextField.text
+                            contact.phonenumber = phoneNumberTextField.text
+                            try context.save()
+                            navigationController?.popViewController(animated: true)
+                        }
+                    }
+                } catch{
+                    print("Didn't get any contact")
+                }
             }
         }
     }
@@ -76,63 +84,19 @@ class AddContactViewController: UIViewController {
     @IBAction func deleteContact(_ sender: Any) {
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         let context: NSManagedObjectContext = appDelegate.persistentContainer.viewContext
-        
         let request = NSFetchRequest<NSFetchRequestResult>(entityName: "Contact")
-        
-        
         do {
             let results:NSArray = try context.fetch(request) as NSArray
             for result in results {
-                
                 let contact = result as! Contact
                 if(contact == selectedContact) {
                     contact.deletedDate = Date()
                     try context.save()
                     navigationController?.popViewController(animated: true)
-                    
                 }
             }
+        } catch {
+            print("Didn't get any contact")
         }
-            catch{
-                print("Didn't get any contact")
-            }
-        }
-    
-    func deleteContact(){
-      
     }
-        
-        
-        
-        
-//        do {
-//            let results:NSArray = try context.fetch(request) as NSArray
-//            for result in results {
-//                let contact = result as! Contact
-//                if(contact == selectedContact) {
-//                    contact.name = nameTextField.text
-//                    contact.phonenumber = phoneNumberTextField.text
-//                    try context.save()
-//                    navigationController?.popViewController(animated: true)
-//                }
-//            }
-//        }
-//        catch{
-//            print("Didn't get any contact")
-//        }
-//    }
-  }
-    
-    
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
-    }
-    */
-
-
+}
