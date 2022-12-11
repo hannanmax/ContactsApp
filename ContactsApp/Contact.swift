@@ -14,4 +14,5 @@ class Contact: NSManagedObject {
   //  @NSManaged var id: NSNumber!
     @NSManaged var name: String!
     @NSManaged var phonenumber: String!
+    @NSManaged var deletedDate: Date?
 }

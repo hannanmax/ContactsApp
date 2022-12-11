@@ -86,7 +86,7 @@ class AddContactViewController: UIViewController {
                 
                 let contact = result as! Contact
                 if(contact == selectedContact) {
-                    context.delete(result as! NSManagedObject)
+                    contact.deletedDate = Date()
                     try context.save()
                     navigationController?.popViewController(animated: true)
                     
