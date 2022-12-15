@@ -13,6 +13,7 @@ var addContact = AddContactViewController()
 class ContactsTableViewController: UITableViewController {
     
     var firstload = true
+    @IBOutlet weak var imgView: UIImageView!
 
     
     override func viewDidLoad() {
@@ -24,6 +25,8 @@ class ContactsTableViewController: UITableViewController {
             let appDelegate = UIApplication.shared.delegate as! AppDelegate
             let context: NSManagedObjectContext = appDelegate.persistentContainer.viewContext
             let request = NSFetchRequest<NSFetchRequestResult>(entityName: "Contact")
+            let sort = NSSortDescriptor(key: "name", ascending: true)
+            request.sortDescriptors = [sort]
             
             do {
                 let results:NSArray = try context.fetch(request) as NSArray
@@ -76,21 +79,13 @@ class ContactsTableViewController: UITableViewController {
         return cell
     }
     
-    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        self.performSegue(withIdentifier: "editContact", sender: self)
-    }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if(segue.identifier == "editContact") {
+        if(segue.identifier == "ViewContact") {
+            let dst = segue.destination as! ContactsViewController
             let indexPath = tableView.indexPathForSelectedRow!
-            
-            let contactDetail = segue.destination as? AddContactViewController
-            
-            let selectedContact: Contact!
-            selectedContact = nonDeletedContacts()[indexPath.row]
-            
-            contactDetail!.selectedContact = selectedContact
-            
+            dst.selectedContact = nonDeletedContacts()[indexPath.row]
+            dst.index = tableView.indexPathForSelectedRow?.row
         }
     }
 

@@ -161,7 +161,6 @@
                             <constraint firstItem="hrE-CW-Jq5" firstAttribute="leading" secondItem="uig-Yw-Cpi" secondAttribute="trailing" constant="10" id="WxM-8X-kqg"/>
                             <constraint firstItem="hrE-CW-Jq5" firstAttribute="centerX" secondItem="Yel-oQ-d0v" secondAttribute="centerX" id="amk-GZ-K86"/>
                             <constraint firstItem="hrE-CW-Jq5" firstAttribute="top" secondItem="82w-24-QMN" secondAttribute="bottom" constant="20" id="bV1-c5-zBS"/>
-                            <constraint firstItem="82w-24-QMN" firstAttribute="top" secondItem="qPE-cT-OOF" secondAttribute="top" constant="10" id="dzQ-b8-15h"/>
                             <constraint firstItem="82w-24-QMN" firstAttribute="top" secondItem="qPE-cT-OOF" secondAttribute="top" constant="20" id="kIr-Fk-Ggp"/>
                         </constraints>
                     </view>
@@ -199,7 +198,7 @@
         </scene>
     </scenes>
     <inferredMetricsTieBreakers>
-        <segue reference="gQe-tf-5F6"/>
+        <segue reference="4LU-Ev-TJN"/>
     </inferredMetricsTieBreakers>
     <resources>
         <image name="person" catalog="system" width="128" height="121"/>

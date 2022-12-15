@@ -8,30 +8,30 @@
 import UIKit
 import CoreData
 
-class AddContactViewController: UIViewController {
+class AddContactViewController: UIViewController, UITextFieldDelegate {
 
     var selectedContact: Contact? = nil
     
-    @IBOutlet weak var warningLabel: UILabel!
     @IBOutlet weak var nameTextField: UITextField!
     @IBOutlet weak var phoneNumberTextField: UITextField!
+    @IBOutlet weak var deleteOutlet: UIButton!
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        if(selectedContact != nil) {
-            nameTextField.text = selectedContact?.name
-            phoneNumberTextField.text = selectedContact?.phonenumber
-        }
-        
-
-        // Do any additional setup after loading the view.
+        deleteOutlet.isHidden = true
+        phoneNumberTextField.delegate = self
     }
     
+    // Mark: UITextViewDelegate
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        let allowedCharacters = "+1234567890"
+        let allowedCharcterSet = CharacterSet(charactersIn: allowedCharacters)
+        let typedCharcterSet = CharacterSet(charactersIn: string)
+        return allowedCharcterSet.isSuperset(of: typedCharcterSet)
+    }
     
     @IBAction func saveButton(_ sender: Any) {
-        
-        if (nameTextField.text!.count <  1) {
+        if (nameTextField.text!.count <  3) {
             let alert = CustomAlertController(title: "Pleae enter a name", message: "Name field is empty")
             DispatchQueue.main.async {
                 self.present(alert.showAlert(), animated: true, completion: nil)
@@ -42,7 +42,6 @@ class AddContactViewController: UIViewController {
                 self.present(alert.showAlert(), animated: true, completion: nil)
             }
         } else {
-            warningLabel.text = ""
             let appDelegate = UIApplication.shared.delegate as! AppDelegate
             let context: NSManagedObjectContext = appDelegate.persistentContainer.viewContext
             if(selectedContact == nil) {
@@ -55,7 +54,7 @@ class AddContactViewController: UIViewController {
                 do {
                     try context.save()
                     Contacts.append(newContact)
-                    navigationController?.popViewController(animated: true)
+                    navigationController?.popToRootViewController(animated: true)
                 } catch  {
                     print("Failed to save contact")
                 }
@@ -70,7 +69,7 @@ class AddContactViewController: UIViewController {
                             contact.name = nameTextField.text
                             contact.phonenumber = phoneNumberTextField.text
                             try context.save()
-                            navigationController?.popViewController(animated: true)
+                            navigationController?.popToRootViewController(animated: true)
                         }
                     }
                 } catch{
@@ -85,18 +84,30 @@ class AddContactViewController: UIViewController {
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         let context: NSManagedObjectContext = appDelegate.persistentContainer.viewContext
         let request = NSFetchRequest<NSFetchRequestResult>(entityName: "Contact")
+        
         do {
             let results:NSArray = try context.fetch(request) as NSArray
             for result in results {
+                
                 let contact = result as! Contact
                 if(contact == selectedContact) {
+                    
                     contact.deletedDate = Date()
                     try context.save()
-                    navigationController?.popViewController(animated: true)
+                    navigationController?.popToRootViewController(animated: true)
+                    
                 }
             }
-        } catch {
+        } catch{
             print("Didn't get any contact")
+        }
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        if(selectedContact != nil) { //if its not nil, filling out the fields
+            nameTextField.text = selectedContact?.name
+            phoneNumberTextField.text = selectedContact?.phonenumber
+            deleteOutlet.isHidden = false
         }
     }
 }
